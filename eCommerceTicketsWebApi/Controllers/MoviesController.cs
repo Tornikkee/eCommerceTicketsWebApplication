@@ -16,7 +16,7 @@ namespace eCommerceTicketsWebApplication.Controllers
         public async Task<IActionResult> Index()
         {
             var allMovies = await _context.Movies.ToListAsync();
-            return View();
+            return View(allMovies);
         }
     }
 }
