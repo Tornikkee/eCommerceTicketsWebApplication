@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using eCommerceTicketsWebApplication.Data.Base;
+using System.ComponentModel.DataAnnotations;
 
 namespace eCommerceTicketsWebApi.Models
 {
-    public class Actor
+    public class Actor : IEntityBase
     {
         public Actor()
         {
