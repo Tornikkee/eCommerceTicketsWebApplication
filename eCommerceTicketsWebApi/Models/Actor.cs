@@ -4,6 +4,11 @@ namespace eCommerceTicketsWebApi.Models
 {
     public class Actor
     {
+        public Actor()
+        {
+            Actors_Movies = new List<Actor_Movie>();
+        }
+
         [Key]
         public int Id { get; set; }
 
