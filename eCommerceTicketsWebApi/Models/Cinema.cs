@@ -19,6 +19,7 @@ namespace eCommerceTicketsWebApi.Models
 
         [Display(Name = "Cinema Name")]
         [Required(ErrorMessage = "Cinema name is required")]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Name must be between 3 and 50 characters")]
         public string Name { get; set; }
 
         [Display(Name = "Description")]
