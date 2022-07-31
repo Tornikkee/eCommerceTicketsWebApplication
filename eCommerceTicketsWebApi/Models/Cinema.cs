@@ -7,7 +7,7 @@ namespace eCommerceTicketsWebApi.Models
     {
         public Cinema()
         {
-            Movies = new List<Movie>();
+            Movies = new List<NewMovieVM>();
         }
 
         [Key]
@@ -27,6 +27,6 @@ namespace eCommerceTicketsWebApi.Models
         public string Description { get; set; }
 
         //RelationProps
-        public List<Movie> Movies { get; set; }
+        public List<NewMovieVM> Movies { get; set; }
     }
 }
