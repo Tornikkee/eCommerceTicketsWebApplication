@@ -1,15 +1,19 @@
 ﻿using eCommerceTicketsWebApi.Models;
 
-namespace eCommerceTicketsWebApplication.Data.ViewModels
+namespace eCommerceTicketsWebApplication.Data.ViewModel
 {
-    public class NewMovieDropDownsVM
+    public class NewMovieDropdownsVM
     {
-        public NewMovieDropDownsVM()
+        public NewMovieDropdownsVM()
         {
-
+            Producers = new List<Producer>();
+            Cinemas = new List<Cinema>();
+            Actors = new List<Actor>();
         }
+
         public List<Producer> Producers { get; set; }
         public List<Cinema> Cinemas { get; set; }
         public List<Actor> Actors { get; set; }
+
     }
 }
