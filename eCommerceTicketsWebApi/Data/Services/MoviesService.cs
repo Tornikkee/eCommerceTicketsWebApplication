@@ -1,6 +1,7 @@
 ﻿using eCommerceTicketsWebApi.Data;
 using eCommerceTicketsWebApi.Models;
 using eCommerceTicketsWebApplication.Data.Base;
+using eCommerceTicketsWebApplication.Data.ViewModel;
 using Microsoft.EntityFrameworkCore;
 
 namespace eCommerceTicketsWebApplication.Data.Services
@@ -19,6 +20,19 @@ namespace eCommerceTicketsWebApplication.Data.Services
             var movieDetails = await _context.Movies.Include(c => c.Cinema).Include(p => p.Producer).Include(am => am.Actors_Movies).ThenInclude(a => a.Actor).FirstOrDefaultAsync(n => n.Id == id);
 
             return movieDetails;
+        }
+
+        public async Task<NewMovieDropdownsVM> GetNewMovieDropdownsValues()
+        {
+            var response = new NewMovieDropdownsVM()
+            {
+                Actors = await _context.Actors.OrderBy(n => n.FullName).ToListAsync(),
+                Cinemas = await _context.Cinemas.OrderBy(n => n.Name).ToListAsync(),
+                Producers = await _context.Producers.OrderBy(n => n.FullName).ToListAsync()
+            };
+            
+
+            return response;
         }
     }
 }
