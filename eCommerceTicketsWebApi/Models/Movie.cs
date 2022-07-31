@@ -1,5 +1,5 @@
-﻿using eCommerceTicketsWebApi.Data;
-using eCommerceTicketsWebApplication.Data.Base;
+﻿using eCommerceTicketsWebApplication.Data.Base;
+using eCommerceTicketsWebApplication.Data.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

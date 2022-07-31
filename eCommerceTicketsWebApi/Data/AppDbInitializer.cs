@@ -1,5 +1,6 @@
 ﻿using eCommerceTicketsWebApi.Data;
 using eCommerceTicketsWebApi.Models;
+using eCommerceTicketsWebApplication.Data.Enums;
 
 namespace eCommerceTicketsWebApplication.Data
 {
