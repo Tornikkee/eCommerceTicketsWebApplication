@@ -1,4 +1,5 @@
 ﻿using eCommerceTicketsWebApi.Models;
+using eCommerceTicketsWebApplication.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace eCommerceTicketsWebApi.Data
@@ -29,5 +30,9 @@ namespace eCommerceTicketsWebApi.Data
         public DbSet<Actor_Movie> Actors_Movies { get; set; }
         public DbSet<Cinema> Cinemas { get; set; }
         public DbSet<Producer> Producers { get; set; }
+
+
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
     }
 }
