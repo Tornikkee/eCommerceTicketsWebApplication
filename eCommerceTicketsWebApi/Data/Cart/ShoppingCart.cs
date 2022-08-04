@@ -1,4 +1,5 @@
 ﻿using eCommerceTicketsWebApi.Data;
+using eCommerceTicketsWebApi.Models;
 using eCommerceTicketsWebApplication.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +16,46 @@ namespace eCommerceTicketsWebApplication.Data.Cart
         public ShoppingCart(AppDbContext context)
         {
             _context = context;
+        }
+
+        public void AddItemToCart(Movie movie)
+        {
+            var shoppingCartItem = _context.ShoppingCartItems.FirstOrDefault(n => n.Movie.Id == movie.Id && n.ShoppingCartId == ShoppingCartId);
+            
+            if(shoppingCartItem == null)
+            {
+                shoppingCartItem = new ShoppingCartItem()
+                {
+                    ShoppingCartId = ShoppingCartId,
+                    Movie = movie,
+                    Amount = 1
+                };
+
+                _context.ShoppingCartItems.Add(shoppingCartItem);
+            }
+            else
+            {
+                shoppingCartItem.Amount++;
+            }
+            _context.SaveChanges(); 
+        }
+
+        public void RemoveItemFromCart(Movie movie)
+        {
+            var shoppingCartItem = _context.ShoppingCartItems.FirstOrDefault(n => n.Movie.Id == movie.Id && n.ShoppingCartId == ShoppingCartId);
+
+            if (shoppingCartItem != null)
+            {
+                if(shoppingCartItem.Amount > 1)
+                {
+                    shoppingCartItem.Amount--;
+                }
+                else
+                {
+                    _context.ShoppingCartItems.Remove(shoppingCartItem);
+                }
+            }
+            _context.SaveChanges();
         }
 
         public List<ShoppingCartItem> GetShoppingCartItems()
