@@ -1,4 +1,5 @@
 ﻿using eCommerceTicketsWebApi.Data;
+using eCommerceTicketsWebApplication.Data.ViewModels;
 using eCommerceTicketsWebApplication.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -18,9 +19,9 @@ namespace eCommerceTicketsWebApplication.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public IActionResult Login()
         {
-            return View();
+            return View(new LoginVM());
         }
     }
 }
