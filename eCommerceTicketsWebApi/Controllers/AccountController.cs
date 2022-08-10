@@ -4,6 +4,7 @@ using eCommerceTicketsWebApplication.Data.ViewModels;
 using eCommerceTicketsWebApplication.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace eCommerceTicketsWebApplication.Controllers
 {
@@ -18,6 +19,13 @@ namespace eCommerceTicketsWebApplication.Controllers
             _userManager = userManager;
             _signingManager = signingManager;
             _context = context;
+        }
+
+        public async Task<IActionResult> Users()
+        {
+            var users = await _context.Users.ToListAsync();
+
+            return View(users);
         }
 
         public IActionResult Login()
