@@ -81,5 +81,12 @@ namespace eCommerceTicketsWebApplication.Controllers
 
             return View("RegisterCompleted");
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            await _signingManager.SignOutAsync();
+            return RedirectToAction("Index", "Movies");
+        }
     }
 }
