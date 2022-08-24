@@ -85,9 +85,14 @@ namespace eCommerceTicketsWebApplication.Controllers
             if (newUserResponse.Succeeded)
             {
                 await _userManager.AddToRoleAsync(newUser, UserRoles.User);
+                return View("RegisterCompleted");
             }
-
-            return View("RegisterCompleted");
+            else
+            {
+                TempData["Error"] = newUserResponse.Errors.First().Description;
+                return View(registerVM);
+            }
+            
         }
 
         [HttpPost]
