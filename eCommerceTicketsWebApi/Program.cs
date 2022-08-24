@@ -19,9 +19,9 @@ builder.Services.AddTransient<IDbConnection>((sp) => new SqlConnection(builder.C
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString")));
 
 builder.Services.AddScoped<IDirectorsRepository, DirectorsRepository>();
-builder.Services.AddScoped<IActorsService, ActorsService>();
-builder.Services.AddScoped<IProducersService, ProducersService>();
-builder.Services.AddScoped<ICinemasService, CinemasService>();
+builder.Services.AddScoped<IActorsRepository, ActorsRepository>();
+builder.Services.AddScoped<IProducersRepository, ProducersRepository>();
+builder.Services.AddScoped<ICinemasRepository, CinemasRepository>();
 builder.Services.AddScoped<IMoviesService, MoviesService>();
 builder.Services.AddScoped<IOrdersService, OrdersService>();
 

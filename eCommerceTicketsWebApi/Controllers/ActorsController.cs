@@ -1,6 +1,8 @@
 ﻿using eCommerceTicketsWebApi.Data;
 using eCommerceTicketsWebApi.Models;
+using eCommerceTicketsWebApplication.Data.Repositories;
 using eCommerceTicketsWebApplication.Data.Services;
+using eCommerceTicketsWebApplication.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,16 +10,16 @@ namespace eCommerceTicketsWebApplication.Controllers
 {
     public class ActorsController : Controller
     {
-        private readonly IActorsService _service;
+        IActorsRepository _repository;
 
-        public ActorsController(IActorsService service)
+        public ActorsController(IActorsRepository repository)
         {
-            _service = service;
+            _repository = repository;
         }
 
         public async Task<IActionResult> Index()
         {
-            var data = await _service.GetAllAsync();
+            var data = await _repository.GetAllAsync();
             return View(data);
         }
 
@@ -27,19 +29,19 @@ namespace eCommerceTicketsWebApplication.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([Bind("FullName,ProfilePictureURL,Bio")]Actor actor)
+        public async Task<IActionResult> Create([Bind("ProfilePictureURL,FullName,Bio")] Actor actor)
         {
             if (!ModelState.IsValid)
             {
                 return View(actor);
             }
-            await _service.AddAsync(actor);
+            await _repository.AddAsync(actor);
             return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Details(int id)
         {
-            var actorDetails = await _service.GetByIdAsync(id);
+            var actorDetails = await _repository.GetByIdAsync(id);
 
             if (actorDetails == null) return View("NotFound");
             return View(actorDetails);
@@ -47,29 +49,26 @@ namespace eCommerceTicketsWebApplication.Controllers
 
         public async Task<IActionResult> Edit(int id)
         {
-            var actorDetails = await _service.GetByIdAsync(id);
+            var actorDetails = await _repository.GetByIdAsync(id);
 
             if (actorDetails == null) return View("NotFound");
             return View(actorDetails);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,FullName,ProfilePictureURL,Bio")] Actor actor)
+        public async Task<IActionResult> Edit(int id, [Bind("FullName,ProfilePictureURL,Bio")] Actor actor)
         {
             if (!ModelState.IsValid)
             {
                 return View(actor);
             }
-            await _service.UpdateAsync(id, actor);
+            await _repository.UpdateAsync(id, actor);
             return RedirectToAction(nameof(Index));
         }
 
-        //TODO user authorization
-        //TODO access for authorized accounts
-
         public async Task<IActionResult> Delete(int id)
         {
-            var actorDetails = await _service.GetByIdAsync(id);
+            var actorDetails = await _repository.GetByIdAsync(id);
             if (actorDetails == null) return View("NotFound");
             return View(actorDetails);
         }
@@ -77,11 +76,11 @@ namespace eCommerceTicketsWebApplication.Controllers
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var actorDetails = await _service.GetByIdAsync(id);
+            var actorDetails = await _repository.GetByIdAsync(id);
             if (actorDetails == null) return View("NotFound");
 
-            await _service.DeleteAsync(id);
-            
+            await _repository.DeleteAsync(id);
+
             return RedirectToAction(nameof(Index));
         }
     }

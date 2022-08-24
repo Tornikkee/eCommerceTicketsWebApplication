@@ -1,5 +1,6 @@
 ﻿using eCommerceTicketsWebApi.Data;
 using eCommerceTicketsWebApi.Models;
+using eCommerceTicketsWebApplication.Data.Repositories;
 using eCommerceTicketsWebApplication.Data.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,22 +9,22 @@ namespace eCommerceTicketsWebApplication.Controllers
 {
     public class ProducersController : Controller
     {
-        private readonly IProducersService _service;
+        private readonly IProducersRepository _repository;
 
-        public ProducersController(IProducersService service)
+        public ProducersController(IProducersRepository repository)
         {
-            _service = service;
+            _repository = repository;
         }
 
         public async Task<IActionResult> Index()
         {
-            var allProducers = await _service.GetAllAsync();
+            var allProducers = await _repository.GetAllAsync();
             return View(allProducers);
         }
 
         public async Task<IActionResult> Details(int id)
         {
-            var producerDetails = await _service.GetByIdAsync(id);
+            var producerDetails = await _repository.GetByIdAsync(id);
             if (producerDetails == null) return View("NotFound");
             return View(producerDetails);
         }
@@ -38,13 +39,13 @@ namespace eCommerceTicketsWebApplication.Controllers
         {
             if (!ModelState.IsValid) return View(producer);
 
-            await _service.AddAsync(producer);
+            await _repository.AddAsync(producer);
             return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Edit(int id)
         {
-            var producerDetails = await _service.GetByIdAsync(id);
+            var producerDetails = await _repository.GetByIdAsync(id);
             if (producerDetails == null) return View("NotFound");
             return View(producerDetails);
         }
@@ -55,7 +56,7 @@ namespace eCommerceTicketsWebApplication.Controllers
             if (!ModelState.IsValid) return View(producer);
             if(id == producer.Id)
             {
-                await _service.UpdateAsync(id, producer);
+                await _repository.UpdateAsync(id, producer);
                 return RedirectToAction(nameof(Index));
             }
             return View(producer);
@@ -63,7 +64,7 @@ namespace eCommerceTicketsWebApplication.Controllers
 
         public async Task<IActionResult> Delete(int id)
         {
-            var producerDetails = await _service.GetByIdAsync(id);
+            var producerDetails = await _repository.GetByIdAsync(id);
             if (producerDetails == null) return View("NotFound");
             return View(producerDetails);
         }
@@ -71,10 +72,10 @@ namespace eCommerceTicketsWebApplication.Controllers
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var producerDetails = await _service.GetByIdAsync(id);
+            var producerDetails = await _repository.GetByIdAsync(id);
             if (producerDetails == null) return View("NotFound");
 
-            await _service.DeleteAsync(id);
+            await _repository.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
     }
