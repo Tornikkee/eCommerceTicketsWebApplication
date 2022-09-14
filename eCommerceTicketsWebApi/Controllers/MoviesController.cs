@@ -1,5 +1,6 @@
 ﻿using eCommerceTicketsWebApi.Data;
 using eCommerceTicketsWebApi.Models;
+using eCommerceTicketsWebApplication.Data.Repositories;
 using eCommerceTicketsWebApplication.Data.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -10,21 +11,23 @@ namespace eCommerceTicketsWebApplication.Controllers
     public class MoviesController : Controller
     {
         private readonly IMoviesService _service;
+        private readonly IMoviesRepository _repository;
 
-        public MoviesController(IMoviesService service)
+        public MoviesController(IMoviesService service, IMoviesRepository repository)
         {
             _service = service;
+            _repository = repository;
         }
 
         public async Task<IActionResult> Index()
         {
-            var allMovies = await _service.GetAllAsync(n => n.Cinema);
+            var allMovies = await _repository.GetAllAsync();
             return View(allMovies);
         }
 
         public async Task<IActionResult> Filter(string searchString)
         {
-            var allMovies = await _service.GetAllAsync(n => n.Cinema);
+            var allMovies = await _repository.GetAllAsync();
 
             if (!string.IsNullOrEmpty(searchString))
             {
@@ -37,13 +40,14 @@ namespace eCommerceTicketsWebApplication.Controllers
 
         public async Task<IActionResult> Details(int id)
         {
-            var movieDetails = await _service.GetMovieByIdAsync(id);
+            //var movieDetails = await _service.GetMovieByIdAsync(id);
+            var movieDetails = await _repository.GetMovieByIdAsync(id);
             return View(movieDetails);
         }
 
         public async Task<IActionResult> Create()
         {
-            var movieDropdownsData = await _service.GetNewMovieDropdownsValues();
+            var movieDropdownsData = await _repository.GetNewMovieDropdownsValues();
 
             ViewBag.Cinemas = new SelectList(movieDropdownsData.Cinemas, "Id", "Name");
             ViewBag.Producers = new SelectList(movieDropdownsData.Producers, "Id", "FullName");
@@ -57,7 +61,7 @@ namespace eCommerceTicketsWebApplication.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var movieDropdownsData = await _service.GetNewMovieDropdownsValues();
+                var movieDropdownsData = await _repository.GetNewMovieDropdownsValues();
 
                 ViewBag.Cinemas = new SelectList(movieDropdownsData.Cinemas, "Id", "Name");
                 ViewBag.Producers = new SelectList(movieDropdownsData.Producers, "Id", "FullName");
@@ -66,13 +70,14 @@ namespace eCommerceTicketsWebApplication.Controllers
                 return View(movie);
             }
 
-            await _service.AddNewMovieAsync(movie);
+            //await _service.AddNewMovieAsync(movie);
+            await _repository.AddAsync(movie);
             return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Edit(int id)
         {
-            var movieDetails = await _service.GetMovieByIdAsync(id);
+            var movieDetails = await _repository.GetMovieByIdAsync(id);
             if (movieDetails == null) return View("NotFound");
 
             var response = new NewMovieVM()
@@ -85,12 +90,12 @@ namespace eCommerceTicketsWebApplication.Controllers
                 MovieCategory = movieDetails.MovieCategory,
                 CinemaId = movieDetails.CinemaId,
                 ProducerId = movieDetails.ProducerId,
-                ActorIds = movieDetails.Actors_Movies.Select(n => n.ActorId).ToList(),
+                //ActorIds = movieDetails.Actors_Movies.Select(n => n.ActorId).ToList(),
                 StartDate = movieDetails.StartDate,
                 EndDate = movieDetails.EndDate
             };
 
-            var movieDropdownsData = await _service.GetNewMovieDropdownsValues();
+            var movieDropdownsData = await _repository.GetNewMovieDropdownsValues();
             ViewBag.Cinemas = new SelectList(movieDropdownsData.Cinemas, "Id", "Name");
             ViewBag.Producers = new SelectList(movieDropdownsData.Producers, "Id", "FullName");
             ViewBag.Actors = new SelectList(movieDropdownsData.Actors, "Id", "FullName");
@@ -105,7 +110,7 @@ namespace eCommerceTicketsWebApplication.Controllers
 
             if (!ModelState.IsValid)
             {
-                var movieDropdownsData = await _service.GetNewMovieDropdownsValues();
+                var movieDropdownsData = await _repository.GetNewMovieDropdownsValues();
 
                 ViewBag.Cinemas = new SelectList(movieDropdownsData.Cinemas, "Id", "Name");
                 ViewBag.Producers = new SelectList(movieDropdownsData.Producers, "Id", "FullName");
@@ -114,7 +119,8 @@ namespace eCommerceTicketsWebApplication.Controllers
                 return View(movie);
             }
 
-            await _service.UpdateMovieAsync(movie);
+            //await _service.UpdateMovieAsync(movie);
+            await _repository.UpdateAsync(id, movie);
             return RedirectToAction(nameof(Index));
         }
     }

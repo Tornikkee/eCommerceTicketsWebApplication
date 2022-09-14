@@ -26,11 +26,14 @@ namespace eCommerceTicketsWebApi.Models
 
         //RelationProps
         public List<Actor_Movie> Actors_Movies { get; set; }
+        
 
-
+        //public int ActorId { get; set; }
+        //[ForeignKey("ActorId")]
 
         public int CinemaId { get; set; }
         [ForeignKey("CinemaId")]
+
 
         public Cinema Cinema { get; set; }
 

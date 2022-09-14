@@ -23,6 +23,7 @@ builder.Services.AddScoped<IActorsRepository, ActorsRepository>();
 builder.Services.AddScoped<IProducersRepository, ProducersRepository>();
 builder.Services.AddScoped<ICinemasRepository, CinemasRepository>();
 builder.Services.AddScoped<IMoviesService, MoviesService>();
+builder.Services.AddScoped<IMoviesRepository, MoviesRepository>();
 builder.Services.AddScoped<IOrdersService, OrdersService>();
 
 
