@@ -1,0 +1,36 @@
+﻿<div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+    <script src="~/lib/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.js"> </script>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <h1>Confirm Transaction</h1>
+
+    <p class="card-text"><b>Id: </b>@ViewBag.TransactionId</p>
+    <p class="card-text"><b>Amount: </b>@ViewBag.Amount</p>
+    <p class="card-text"><b>Transaction Type: </b>Payment</p>
+
+    <div class="form-group">
+
+        <a class="btn btn-outline-success my-2 my-sm-0" asp-controller="Payment" asp-action="SendAcceptPaymentData" asp-route-transactionId="@ViewBag.TransactionId" asp-route-amount=@ViewBag.Amount>
+            Accept
+        </a>
+
+        <a class="btn btn-outline-danger my-2 my-sm-0" asp-controller="Payment" asp-action="SendRejectPaymentData" asp-route-transactionId="@ViewBag.TransactionId" asp-route-amount=@ViewBag.Amount>
+            Reject
+        </a>
+
+    </div>
+</div>

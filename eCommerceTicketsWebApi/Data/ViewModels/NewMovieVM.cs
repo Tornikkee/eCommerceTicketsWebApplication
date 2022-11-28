@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace eCommerceTicketsWebApi.Models
 {
+    //public delegate void 
     public class NewMovieVM
     {
         public int Id { get; set; }
@@ -23,6 +24,7 @@ namespace eCommerceTicketsWebApi.Models
 
         [Display(Name = "Movie poster URL")]
         [Required(ErrorMessage = "Movie poster URL is required")]
+        //[Required()]
         public string ImageURL { get; set; }
 
         [Display(Name = "Movie start date")]

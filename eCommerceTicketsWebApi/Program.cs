@@ -24,11 +24,14 @@ builder.Services.AddScoped<IProducersRepository, ProducersRepository>();
 builder.Services.AddScoped<ICinemasRepository, CinemasRepository>();
 builder.Services.AddScoped<IMoviesService, MoviesService>();
 builder.Services.AddScoped<IMoviesRepository, MoviesRepository>();
-builder.Services.AddScoped<IOrdersService, OrdersService>();
+builder.Services.AddScoped<IOrdersRepository, OrdersRepository>();
+builder.Services.AddScoped<IWalletsRepository, WalletsRepository>();
+builder.Services.AddScoped<ITransactionsRepository, TransactionsRepository>();
 
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped(sc => ShoppingCart.GetShoppingCart(sc));
+builder.Services.AddHttpClient();
 
 //Authentication and authorization
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>();
@@ -67,7 +70,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-AppDbInitializer.Seed(app);
-AppDbInitializer.SeedUsersAndRolesAsync(app).Wait();
+//AppDbInitializer.Seed(app);
+//AppDbInitializer.SeedUsersAndRolesAsync(app).Wait();
 
 app.Run();

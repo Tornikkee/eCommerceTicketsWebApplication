@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="~/js/site.js"/>
 </head>
 <body>
     <header>
@@ -20,34 +21,66 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Movies" asp-action="Index"><i class="bi bi-film"></i> Movies</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Movies" asp-action="Index"><i class="bi bi-film"></i></a>
                         </li>
 
                         @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
                         {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="bi bi-gear"></i> Management
-                                </a>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Cinemas" asp-action="Index"><i class="bi bi-camera-reels"></i></a>
+                            </li>
 
-                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" asp-controller="Cinemas" asp-action="Index"><i class="bi bi-camera-reels"></i> Cinemas</a>
-                                    <a class="dropdown-item" asp-controller="Producers" asp-action="Index"><i class="bi bi-headset"></i> Producers</a>
-                                    <a class="dropdown-item" asp-controller="Actors" asp-action="Index"><i class="bi bi-person-square"></i> Actors</a>
-                                </div>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Producers" asp-action="Index"><i class="bi bi-headset"></i></a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Actors" asp-action="Index"><i class="bi bi-person-square"></i></a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Directors" asp-action="Index"><i class="bi bi-file-earmark-person-fill"></i></a>
                             </li>
                         }
 
+                        @*@if(User.Identity.IsAuthenticated)
+                        {
+                        <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Wallets" asp-action="Create"><i class="bi bi-plus"></i> Add Wallet</a>
+                        </li>
+                        <button class="btn btn-outline-success">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Transactions" asp-action="Deposit"><i class="bi bi-cash"></i> Deposit</a>
+                        </button>
+
+                        }*@
+
                     </ul>
 
-                    <form class="form-inline my-2 my-lg-0" asp-controller="Movies" asp-action="Filter" style="padding-right: 100px;">
-                        <input name="searchString" type="text" class="form-control mr-sm-2" placeholder="Search for a movie..." aria-label="Recipient's username" aria-describedby="button-addon2">
+                    <form class="form-inline my-2 my-lg-0" asp-controller="Movies" asp-action="Filter" style="padding-right: 25px;">
+                        <input name="searchString" type="text" class="form-control" placeholder="Search for a movie..." aria-label="Recipient's username" aria-describedby="button-addon2">
                         <button class="btn btn-outline-dark my-2 my-sm-0" type="submit"><i class="bi bi-search"></i></button>
                     </form>
 
                     <ul class="navbar-nav">
                         @await Component.InvokeAsync("ShoppingCartSummary")
                     </ul>
+
+                    @*<ul class="navbar-nav">
+                        <a class="nav-item text-dark" id="getBalance"></a>
+                    </ul>*@
+
+                    @if(User.Identity.IsAuthenticated){
+                            <i class="bi bi-wallet" id="getBalance" style="padding: 25px"></i>
+                    }
+
+                    @*<ul class="navbar-nav text-right">
+                        <li class="nav-item active">
+                            <a class="nav-item text-light" id="balance"></a>
+                        </li>
+                    </ul>*@
+                    @*<partial name="_Balance.cshtml" />*@
+
+                    @*<partial name="_Balance.cshtml" />*@
 
                     <partial name="_Identity.cshtml" />
                 </div>
@@ -63,14 +96,36 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2021 - eTickets
+            &copy; 2022 - eTickets by Tornike Khamitsashvili
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+    <script src="~/lib/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.js"> </script>
+
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            function getBalance () {
+                $.ajax("/Wallets/GetBalance")
+                    .done(function (result) {
+                        console.log(result);
+                        $('#getBalance').html(result.balance + "₾")
+                    })
+            };
+            setInterval(getBalance(), 3000);
+        });
+    </script>
+
+
 </body>
 </html>

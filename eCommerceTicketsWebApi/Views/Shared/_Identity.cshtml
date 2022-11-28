@@ -1,6 +1,9 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using eCommerceTicketsWebApplication.Data.Repositories
 @using eCommerceTicketsWebApplication.Models
-@inject UserManager<ApplicationUser> UserManager; 
+@using System.Security.Claims;
+@inject UserManager<ApplicationUser> UserManager;
+@inject IWalletsRepository walletsRepo;
 
 @if (!User.Identity.IsAuthenticated)
 {
@@ -12,6 +15,8 @@
     <a class="btn btn-outline-primary my-2 my-sm-0" asp-controller="Account" asp-action="Register">
         <i class="bi bi-person-plus"></i> Register
     </a>
+
+
 }
 else
 {
@@ -19,8 +24,8 @@ else
     @*User profile section*@
     <div class="dropdown">
         <button class="btn btn-outline-success dropdown-toggle" type="button" id="profile-btn" data-toggle="dropdown"
-                aria-expanded="false">
-            <i class="bi bi-person-badge"></i> Hello @UserManager.GetUserName(User)
+            aria-expanded="false">
+            <i class="bi bi-person-badge"></i> @UserManager.GetUserName(User)
         </button>
         <ul class="dropdown-menu" aria-labelledby="profile-btn">
             <li>
@@ -38,6 +43,26 @@ else
                 </li>
             }
         </ul>
+
+        @if (walletsRepo.GetWalletByUserId(User.FindFirstValue(ClaimTypes.NameIdentifier)).Result == null){
+            <a class="btn btn-outline-primary my-2 my-sm-0" asp-controller="Wallets" asp-action="Create">
+                <i class="bi bi-plus-circle"></i> Create Wallet
+            </a>
+        }
+        @if (walletsRepo.GetWalletByUserId(User.FindFirstValue(ClaimTypes.NameIdentifier)).Result != null){
+
+            <a class="btn btn-outline-success my-2 my-sm-0" asp-controller="Transactions" asp-action="Deposit">
+                <i class="bi bi-cash"></i> Deposit
+            </a>
+            <a class="btn btn-outline-danger my-2 my-sm-0" asp-controller="Transactions" asp-action="Withdraw">
+                <i class="bi bi-cash"></i> Withdraw
+            </a>
+            <a class="btn btn-outline-dark my-2 my-sm-0" asp-controller="Transactions" asp-action="TransactionHistory">
+                Transactions
+            </a>
+        }
+
+
     </div>
     <span style="padding: 5px;"></span>
     <form asp-controller="Account" asp-action="Logout">

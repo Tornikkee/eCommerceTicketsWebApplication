@@ -1,5 +1,6 @@
-﻿@using eCommerceTicketsWebApplication.Models
-@model List<Order>
+﻿@using eCommerceTicketsWebApplication.DTOS
+@using eCommerceTicketsWebApplication.Models
+@model List<OrderDTO>
 
 @{ 
     ViewData["Title"] = "All orders";
@@ -30,22 +31,19 @@
                     <td class="align-middle">@order.Id</td>
                     <td class="align-middle">
                         <ul style="list-style-type:none">
-                            @foreach (var item in order.OrderItems)
-                            {
                                 <li>
                                     <div class="alert alert-info" role="alert">
-                                        <span class="badge bg-success">@item.Amount</span> [@item.Price.ToString("c")] - @item.Movie.Name
+                                        <span class="badge bg-success">@order.Amount</span> [@order.Price.ToString("c")] - @order.Name
                                     </div>
                                 </li>
-                            }
                         </ul>
                     </td>
                     <td class="align-middle">
-                        @order.OrderItems.Select(m => m.Movie.Price * m.Amount).Sum().ToString("c")
+                        @((order.Amount * order.Price).ToString("c"))
                     </td>
                     @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
                     {
-                        <td class="align-middle"> @order.User.FullName </td>
+                        <td class="align-middle"> @order.FullName </td>
                     }
                     </tr>
                 }
