@@ -13,5 +13,7 @@ namespace eCommerceTicketsWebApplication.Data.Repositories
         Task<IEnumerable<TransactionHistoryDTO>> TransactionHistory(string userId);
         Task<int> GetLastTransactionId();
         Task<string> GetUserId();
+        Task Bet(decimal amount, string userId);
+        Task RecordCasinoTransaction(string userId, decimal amount, decimal currentBalance, TransactionStatus transactionStatus, string currency);
     }
 }

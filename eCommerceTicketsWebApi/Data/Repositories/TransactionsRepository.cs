@@ -125,5 +125,41 @@ namespace eCommerceTicketsWebApplication.Data.Repositories
                 return userId;
             }
         }
+
+        public async Task Bet(decimal amount, string userId)
+        {
+            DynamicParameters dp = new DynamicParameters();
+            dp.Add("@UserId", userId);
+
+            using (IDbConnection db = connection)
+            {
+                var wallet = await db.QueryFirstOrDefaultAsync<Wallet>("GetWalletByUserId", dp, commandType: CommandType.StoredProcedure);
+
+                dp = new DynamicParameters();
+                dp.Add("@UserId", userId);
+                dp.Add("@Balance", wallet.Balance - amount);
+
+                if (wallet.Balance > amount)
+                {
+                    await db.ExecuteAsync("UpdateBalanceById", dp, commandType: CommandType.StoredProcedure);
+                }
+            }
+        }
+
+        public async Task RecordCasinoTransaction(string userId, decimal amount, decimal currentBalance, TransactionStatus transactionStatus, string currency)
+        {
+            DynamicParameters dp = new DynamicParameters();
+            dp.Add("@UserId", userId);
+            dp.Add("@Amount", amount);
+            dp.Add("@CurrentBalance", currentBalance);
+            dp.Add("@TransactionStatus", transactionStatus);
+            dp.Add("@BetType", BetType.Normal);
+            dp.Add("@Currency", currency);
+
+            using(IDbConnection db = new SqlConnection(connectionString))
+            {
+                await db.ExecuteAsync("RecordCasinoTransaction", dp, commandType: CommandType.StoredProcedure);
+            }
+        }
     }
 }

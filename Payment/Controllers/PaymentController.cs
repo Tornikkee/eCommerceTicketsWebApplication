@@ -1,10 +1,5 @@
-﻿using eCommerceTicketsWebApplication.DTOS;
-using Microsoft.AspNetCore.Mvc;
-using System.Net.Http;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
-using System.Runtime.CompilerServices;
-using Newtonsoft.Json;
-using Payment.Models;
 
 namespace Payment.Controllers
 {

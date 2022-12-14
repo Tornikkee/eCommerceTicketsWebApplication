@@ -208,5 +208,11 @@ namespace eCommerceTicketsWebApplication.Controllers
             var transactions = await _repository.TransactionHistory(User.FindFirstValue(ClaimTypes.NameIdentifier));
             return Json(new { data = transactions });
         }
+
+        [HttpGet]
+        public IActionResult TransactionsHistoryTable()
+        {
+            return View();
+        }
     }
 }
