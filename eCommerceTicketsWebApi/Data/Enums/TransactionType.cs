@@ -4,6 +4,7 @@
     {
         Deposit = 1,
         Withdrawal,
-        Payment
+        Payment,
+        CancelBet
     }
 }

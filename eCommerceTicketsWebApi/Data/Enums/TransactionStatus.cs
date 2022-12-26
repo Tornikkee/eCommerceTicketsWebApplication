@@ -4,6 +4,7 @@
     {
         Success = 1,
         Pending,
-        Failed
+        Failed,
+        Canceled
     }
 }

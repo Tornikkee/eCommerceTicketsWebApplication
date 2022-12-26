@@ -37,40 +37,11 @@ namespace eCommerceTicketsWebApplication.Controllers
             return hashValue.Aggregate(hex, (current, bt) => current + $"{bt:x2}");
         }
 
-        public async Task<IActionResult> GameLounch()
+        public async Task<IActionResult> GameLounch(string token, string privateToken)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            string token = await _repository.GetTokenByUserId(userId);
-            string hashedToken = GetSha256(token);
-
-            using (var client = new HttpClient())
-            {
-                var baseUrl = string.Format($"https://localhost:44373/api/Casino/Auth?publicToken={hashedToken}");
-
-                client.BaseAddress = new Uri(baseUrl);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                //var json = JsonConvert.SerializeObject(hashedToken);
-                
-                var authInfo = new AuthInfo { UserId = userId, PublicToken = hashedToken };
-
-                var data = new StringContent(authInfo.ToString(), Encoding.UTF8, "application/json");
-
-                HttpResponseMessage response = await client.PostAsync(baseUrl, data);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return Json(new
-                    {
-                        StatusCode = 200,
-                        Data = new
-                        {
-                            Token = token
-                        }
-                    });
-                }
-                return Json(StatusCodes.Status500InternalServerError);
-            }
+            await _repository.FillUsersAndTokens(token, userId, privateToken);
+            return Ok();
         }
     }
 }

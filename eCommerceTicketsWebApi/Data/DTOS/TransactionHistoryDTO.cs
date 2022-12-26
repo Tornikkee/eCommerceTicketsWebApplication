@@ -15,5 +15,11 @@ namespace eCommerceTicketsWebApplication.DTOS
         public TransactionType TransactionType { get; set; }
 
         public TransactionStatus TransactionStatus { get; set; }
+
+        public BetType BetType { get; set; }
+
+        public string? Currency { get; set; }
+
+        public WinType WinType { get; set; }
     }
 }

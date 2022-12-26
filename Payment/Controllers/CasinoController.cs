@@ -13,6 +13,13 @@ using Payment.Repositories;
 using Payment.Models;
 using eCommerceTicketsWebApplication.Data.Enums;
 using XSystem.Security.Cryptography;
+using System.Drawing.Drawing2D;
+using Betsolutions.Casino.SDK;
+using Betsolutions.Casino.SDK.TableGames.Seka.Enums;
+using Betsolutions.Casino.SDK.Enums;
+using StatusCodes = Betsolutions.Casino.SDK.StatusCodes;
+using AuthInfo = Payment.Models.AuthInfo;
+using XAct.Users;
 
 namespace Payment.Controllers
 {
@@ -50,15 +57,27 @@ namespace Payment.Controllers
         [HttpPost]
         public async Task<IActionResult> Auth(string publicToken)
         {
-            var userId = await _transactionsRepository.GetUserId();
-            var token = await _launchRepository.GetTokenByUserId(userId);
-            string hashedToken = GetSha256(token);
+            var userId = await _casinoRepository.GetUserIdWithToken(publicToken);
 
-            if (hashedToken == publicToken)
+            if (userId == null)
             {
-                return Ok();
+                return StatusCode((int)StatusCodes.UserNotFound);
             }
-            return Problem(statusCode: StatusCodes.Status500InternalServerError);
+            var token = await _launchRepository.GetTokenByUserId(userId);
+            //string hashedToken = GetSha256(token);
+
+            if (token == publicToken)
+            {
+                string privateToken = await _casinoRepository.GetPrivateToken(userId);
+                var authInfo = new AuthInfo { PrivateToken = privateToken };
+                var response = new AuthSuccess { StatusCode = (int)StatusCodes.Success, Data = authInfo };
+                return Ok(response);
+            }
+            else if (token != publicToken)
+            {
+                return StatusCode((int)StatusCodes.InvalidHash);
+            }
+            return StatusCode(statusCode: (int)Betsolutions.Casino.SDK.StatusCodes.GeneralError);
         }
 
         [Route("get-player-info")]
@@ -66,14 +85,21 @@ namespace Payment.Controllers
         public async Task<IActionResult> GetPlayerInfo(string token, string hash)
         {
             var userId = await _casinoRepository.GetUserIdWithToken(token);
+
+            if (userId == null)
+            {
+                return StatusCode((int)StatusCodes.UserNotFound, new UserNotFound { StatusCode = (int)StatusCodes.UserNotFound, ErrorMessage = "UserNotFound" });
+            }
+
             var hashedToken = GetSha256(token);
-            if(hashedToken == hash)
+
+            if (hashedToken == hash)
             {
                 var user = await _casinoRepository.GetUser(userId);
-                var response = new SuccessfulResponse { StatusCode = (int)StatusCodes.Status200OK, Data = user };//change
+                var response = new SuccessfulResponse { StatusCode = (int)StatusCodes.Success, Data = user };
                 return Ok(response);
             }
-            return Problem(statusCode: StatusCodes.Status500InternalServerError);
+            return StatusCode(statusCode: (int)Betsolutions.Casino.SDK.StatusCodes.GeneralError);
         }
 
         [Route("get-balance")]
@@ -82,39 +108,153 @@ namespace Payment.Controllers
         {
             var userId = await _casinoRepository.GetUserIdWithToken(token);
             var hashedToken = GetSha256(token);
-            if(hashedToken == hash)
+            if (hashedToken == hash)
             {
                 var balance = await _walletsRepository.GetBalanceAsync(userId);
                 var currBalance = new Balance { CurrentBalance = balance };
-                var response = new SuccessfulBalanceResponse { StatusCode = (int)StatusCodes.Status200OK, Data = currBalance };//change
+                var response = new SuccessfulBalanceResponse { StatusCode = (int)StatusCodes.Success, Data = currBalance };//change
                 return Ok(response);
             }
-            return Problem(statusCode: StatusCodes.Status500InternalServerError);
+            return StatusCode(statusCode: (int)Betsolutions.Casino.SDK.StatusCodes.GeneralError);
         }
 
         [Route("Bet")]
         [HttpPost]
-        public async Task<IActionResult> Bet(string token, string hash, decimal amount, string currency)
+        public IActionResult Bet(string token, decimal amount, string transactionId, BetType betType, int gameId, int productId, int roundId, string currency, int campaignId, string campaignName, string hash)
         {
-            var userId = await _casinoRepository.GetUserIdWithToken(token);
-            var hashedToken = GetSha256(token);
-            if(hashedToken == hash)
-            {
-                 var balance = await _walletsRepository.GetBalanceAsync(userId);
-                if(balance >= amount)
-                {
-                    //Bet Procedure //Win procedure //CancelBet procedure //unique transaction ensure cancel duplicates
+            var rawHash = $"{token}|{amount}|{transactionId}|{betType}|{gameId}|{productId}|{roundId}|{currency}|{campaignId}|{campaignName}";
+            var hash1 = GetSha256(rawHash);
+            var userId = _casinoRepository.GetUserIdWithToken(token).Result;
 
-                    await _transactionsRepository.Bet(amount, userId);
-                    await _transactionsRepository.RecordCasinoTransaction(userId, amount, balance - amount, TransactionStatus.Success, currency);
-                    var currentBalance = await _walletsRepository.GetBalanceAsync(userId);
-                    var transactionId = await _transactionsRepository.GetLastTransactionId();
-                    var betInfo = new BetInfo { TransactionId = transactionId, CurrentBalance = currentBalance };
-                    var response = new SuccessfulBetResponse { StatusCode = (int)StatusCodes.Status200OK, Data = betInfo };
-                    return Ok(response);
-                }
+            if (userId == null)
+            {
+                return StatusCode((int)StatusCodes.UserNotFound);
             }
-            return Problem(statusCode: StatusCodes.Status500InternalServerError);
+
+            if (amount <= 0)
+            {
+                return StatusCode((int)StatusCodes.InvalidAmount);
+            }
+
+            if (hash != hash1)
+            {
+                return Ok(new { StatusCode = (int)StatusCodes.GeneralError });
+            }
+
+            var statusCode = _casinoRepository.Bet(amount, transactionId, betType, currency, userId, out var currentBalance, out var internalTransactionId);
+
+            if (statusCode == 0)
+            {
+                var betInfo = new BetInfo { TransactionId = internalTransactionId, CurrentBalance = currentBalance };
+                var response = new SuccessfulBetResponse { StatusCode = (int)StatusCodes.Success, Data = betInfo };
+                return Ok(response);
+            }
+            else if (statusCode == -1)
+            {
+                var betInfo = new BetInfo { TransactionId = internalTransactionId, CurrentBalance = currentBalance };
+                var response = new SuccessfulBetResponse { StatusCode = (int)StatusCodes.AlreadyProcessedTransaction, Data = betInfo };
+                return Ok(response);
+            }
+            else
+            {
+                return Ok(new { StatusCode = (int)StatusCodes.GeneralError });
+            }
+
+
+        }
+
+        [Route("Win")]
+        [HttpPost]
+        public IActionResult Win(string token, decimal amount, string transactionId, WinType winType, int gameId, int productId, Int64 roundId, string hash, string currency, int campaignId, string campaignName)
+        {
+            var rawHash = $"{token}|{amount}|{transactionId}|{winType}|{gameId}|{productId}|{roundId}|{currency}|{campaignId}|{campaignName}";
+            var hash1 = GetSha256(rawHash);
+            var userId = _casinoRepository.GetUserIdWithToken(token).Result;
+
+            if (userId == null)
+            {
+                return StatusCode((int)StatusCodes.UserNotFound);
+            }
+
+            if (amount <= 0)
+            {
+                return StatusCode((int)StatusCodes.InvalidAmount);
+            }
+
+            if (hash != hash1)
+            {
+                return Ok(new { StatusCode = (int)StatusCodes.GeneralError });
+            }
+
+            var statusCode = _casinoRepository.Win(amount, transactionId, winType, currency, userId, out var currentBalance, out var internalTransactionId);
+
+            if(statusCode == 0)
+            {
+                var winInfo = new WinInfo { TransactionId = internalTransactionId, CurrentBalance = currentBalance };
+                var response = new SuccessfulWinResponse { StatusCode = (int)StatusCodes.Success, Data = winInfo };
+                return Ok(response);
+            }
+            else if(statusCode == -1)
+            {
+                var winInfo = new WinInfo { TransactionId = internalTransactionId, CurrentBalance = currentBalance };
+                var response = new SuccessfulWinResponse { StatusCode = (int)StatusCodes.AlreadyProcessedTransaction, Data = winInfo };
+                return Ok(response);
+            }
+            else if(statusCode == -2)
+            {
+                return Ok(new {StatusCode = (int)StatusCodes.GeneralError });
+            }
+            else
+            {
+                return Ok(new { StatusCode = (int)StatusCodes.GeneralError });
+            }
+        }
+
+        [Route("CancelBet")]
+        [HttpPost]
+        public IActionResult CancelBet(string token, decimal amount, string transactionId, BetType betType, int gameId, int productId, Int64 roundId, string hash, string currency, string betTransactionId)
+        {
+            var rawHash = $"{token}|{amount}|{transactionId}|{betType}|{gameId}|{productId}|{roundId}|{currency}|{betTransactionId}";
+            var hash1 = GetSha256(rawHash);
+            var userId = _casinoRepository.GetUserIdWithToken(token).Result;
+
+            if (userId == null)
+            {
+                return StatusCode((int)StatusCodes.UserNotFound);
+            }
+
+            if (amount <= 0)
+            {
+                return StatusCode((int)StatusCodes.InvalidAmount);
+            }
+
+            if (hash != hash1)
+            {
+                return Ok(new { StatusCode = (int)StatusCodes.GeneralError });
+            }
+
+            var statusCode = _casinoRepository.CancelBet(amount, transactionId, betType, currency, userId, betTransactionId, out var currentBalance, out var internalTransactionId);
+
+            if(statusCode == 0)
+            {
+                var cancelBetInfo = new CancelBetInfo { TransactionId = internalTransactionId, CurrentBalance = currentBalance };
+                var response = new SuccesfulCancelBetResponse { StatusCode = (int)StatusCodes.Success, Data = cancelBetInfo };
+                return Ok(response);
+            }
+            else if(statusCode == -1)
+            {
+                var cancelBetInfo = new CancelBetInfo { TransactionId = internalTransactionId, CurrentBalance = currentBalance };
+                var response = new SuccesfulCancelBetResponse { StatusCode = (int)StatusCodes.AlreadyProcessedTransaction, Data = cancelBetInfo };
+                return Ok(response);
+            }
+            else if (statusCode == -2)
+            {
+                return Ok(new { StatusCode = (int)StatusCodes.GeneralError });
+            }
+            else
+            {
+                return Ok(new { StatusCode = (int)StatusCodes.GeneralError });
+            }
         }
     }
 }

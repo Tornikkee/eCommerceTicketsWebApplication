@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Betsolutions.Casino.SDK" Version="1.0.4" />
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="jQuery.Validation" Version="1.19.5" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.9" />

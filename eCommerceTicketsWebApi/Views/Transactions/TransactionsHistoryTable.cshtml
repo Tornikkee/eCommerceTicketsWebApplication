@@ -32,14 +32,24 @@
 
             <script type="text/javascript">
                 $(document).ready(function () {
-                    $("#tHistory").DataTable({
-                        "ajax": {
-                            "url": "/Transactions/TransactionHistory",
-                            "type": "GET",
-                            "data": "json",
-                            "dataSrc" : ""
+                    $('#tHistory').DataTable({
+                        ajax: {
+                            url: '/Transactions/TransactionHistory',
+                            type: 'GET',
+                            data: 'json',
+                            dataSrc : ''
                         },
-                        
+                        columns: [
+                            { data: 'Id' },
+                            { data: 'UserId' },
+                            { data: 'Amount' },
+                            { data: 'CurrentBalance' },
+                            { data: 'TransactionType' },
+                            { data: 'TransactionStatus' },
+                            { data: 'BetType' },
+                            { data: 'Currency' },
+                            { data: 'WinType' },
+                        ]
 
                     });
                 });
