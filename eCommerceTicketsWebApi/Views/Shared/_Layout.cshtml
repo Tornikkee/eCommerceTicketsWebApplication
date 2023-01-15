@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using System.Web.Optimization
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -109,6 +110,12 @@
     <script src="~/lib/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.js"> </script>
 
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @*<script src="~/bundles/jquery"></script>*@
+    @*<script src="~/bundles/jquery" asp-src-include="~/bundles/jquery"></script>*@
+
+    @*<script src="~/bundles/bootstrap"></script>*@
+    @*<script src="~/bundles/bootstrap" asp-src-include="~/bundles/bootstrap"></script>*@
 
     @await RenderSectionAsync("Scripts", required: false)
 

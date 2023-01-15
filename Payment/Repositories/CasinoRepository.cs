@@ -79,6 +79,28 @@ namespace Payment.Repositories
             }
         }
 
+        public int ChangeWin(decimal amount, decimal previousAmount, string transactionId, string previousTransactionId, string userId, string currency, out decimal currentBalance, out int internalTransactionId)
+        {
+            DynamicParameters dp = new DynamicParameters();
+            dp.Add("@Amount", amount);
+            dp.Add("@PreviousAmount", previousAmount);
+            dp.Add("@TransactionId", transactionId);
+            dp.Add("@PreviousTransactionId", previousTransactionId);
+            dp.Add("@UserId", userId);
+            dp.Add("@Currency", currency);
+            dp.Add("@CurrentBalance", dbType: DbType.Decimal, direction: ParameterDirection.Output, precision: 38, scale: 5);
+            dp.Add("@InternalTransactionId", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            dp.Add("ReturnValue", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+
+            using(IDbConnection db = new SqlConnection(connectionString))
+            {
+                db.Execute("ChangeWin", dp, commandType: CommandType.StoredProcedure);
+                currentBalance = dp.Get<decimal>("CurrentBalance");
+                internalTransactionId = dp.Get<int>("InternalTransactionId");
+                return dp.Get<int>("ReturnValue");
+            }
+        }
+
         public async Task<string> GetPrivateToken(string userId)
         {
             DynamicParameters dp = new DynamicParameters();

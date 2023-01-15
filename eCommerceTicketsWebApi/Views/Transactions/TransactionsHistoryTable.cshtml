@@ -1,60 +1,78 @@
-﻿@{
+﻿@using System.Web.Optimization;
+@using DataTables;
+
+@{
     ViewData["Title"] = "All transactions";
 }
 
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+<h2>Transactions History</h2>
 
-<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+<table id="transactions" class="display" style="width:100%">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Amount</th>
+            <th>Current Balance</th>
+            <th>User Id</th>
+            <th>Transaction Status</th>
+        </tr>
+    </thead>
 
-<script src="~/lib/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.js"> </script>
+    <tbody>
+    </tbody>
 
-<script src="~/js/site.js" asp-append-version="true"></script>
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.css">
+    <tfoot>
+        <tr>
+            <td>Id</td>
+            <td>Amount</td>
+            <td>Current Balance</td>
+            <td>User Id</td>
+            <td>Transaction Status</td>
+        </tr>
+    </tfoot>
+</table>
 
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>
+@*<link rel="stylesheet" href="//cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" />*@
 
-<div class="row">
-    <div class="col-md-8 offset-2">
-        <p>
-            <h4>Transaction History</h4>
-        </p>
+@section scripts {
 
-        <table id="tHistory" class="display">
-            
-        </table>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script src="~/lib/jquery-validation/dist/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/additional-methods.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
 
-        
-        @section scripts{
-            <script src="//cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/lib/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.min.js"></script>
+    <script src="~/lib/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.js"></script>
 
-            <script type="text/javascript">
-                $(document).ready(function () {
-                    $('#tHistory').DataTable({
-                        ajax: {
-                            url: '/Transactions/TransactionHistory',
-                            type: 'GET',
-                            data: 'json',
-                            dataSrc : ''
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
+
+    <script src="//cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+
+    <script type="text/javascript" language="javascript">
+        $(document).ready(function () {
+            var table =
+                $('#transactions').DataTable(
+                    {
+                        "ajax": {
+                            "url": "TransactionHistory",
+                            "type": "GET",
+                            "datatype": "json"
                         },
+
                         columns: [
-                            { data: 'Id' },
-                            { data: 'UserId' },
-                            { data: 'Amount' },
-                            { data: 'CurrentBalance' },
-                            { data: 'TransactionType' },
-                            { data: 'TransactionStatus' },
-                            { data: 'BetType' },
-                            { data: 'Currency' },
-                            { data: 'WinType' },
+                            { data: 'id' },
+                            { data: 'amount' },
+                            { data: 'currentBalance' },
+                            { data: 'userId' },
+                            { data: 'transactionStatus' }
                         ]
 
                     });
-                });
-            </script>
-        }
 
-        </div>
-    </div>
+
+        });
+    </script>
+}

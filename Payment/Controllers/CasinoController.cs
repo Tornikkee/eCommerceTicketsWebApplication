@@ -136,10 +136,10 @@ namespace Payment.Controllers
                 return StatusCode((int)StatusCodes.InvalidAmount);
             }
 
-            if (hash != hash1)
-            {
-                return Ok(new { StatusCode = (int)StatusCodes.GeneralError });
-            }
+            //if (hash != hash1)
+            //{
+            //    return Ok(new { StatusCode = (int)StatusCodes.GeneralError });
+            //}
 
             var statusCode = _casinoRepository.Bet(amount, transactionId, betType, currency, userId, out var currentBalance, out var internalTransactionId);
 
@@ -181,10 +181,10 @@ namespace Payment.Controllers
                 return StatusCode((int)StatusCodes.InvalidAmount);
             }
 
-            if (hash != hash1)
-            {
-                return Ok(new { StatusCode = (int)StatusCodes.GeneralError });
-            }
+            //if (hash != hash1)
+            //{
+            //    return Ok(new { StatusCode = (int)StatusCodes.GeneralError });
+            //}
 
             var statusCode = _casinoRepository.Win(amount, transactionId, winType, currency, userId, out var currentBalance, out var internalTransactionId);
 
@@ -228,10 +228,10 @@ namespace Payment.Controllers
                 return StatusCode((int)StatusCodes.InvalidAmount);
             }
 
-            if (hash != hash1)
-            {
-                return Ok(new { StatusCode = (int)StatusCodes.GeneralError });
-            }
+            //if (hash != hash1)
+            //{
+            //    return Ok(new { StatusCode = (int)StatusCodes.GeneralError });
+            //}
 
             var statusCode = _casinoRepository.CancelBet(amount, transactionId, betType, currency, userId, betTransactionId, out var currentBalance, out var internalTransactionId);
 
@@ -245,6 +245,55 @@ namespace Payment.Controllers
             {
                 var cancelBetInfo = new CancelBetInfo { TransactionId = internalTransactionId, CurrentBalance = currentBalance };
                 var response = new SuccesfulCancelBetResponse { StatusCode = (int)StatusCodes.AlreadyProcessedTransaction, Data = cancelBetInfo };
+                return Ok(response);
+            }
+            else if (statusCode == -2)
+            {
+                var cancelBetInfo = new CancelBetInfo { TransactionId = internalTransactionId, CurrentBalance = currentBalance };
+                var response = new SuccesfulCancelBetResponse { StatusCode = (int)StatusCodes.Success, Data = cancelBetInfo };
+                return Ok(response);
+            }
+            else
+            {
+                return Ok(new { StatusCode = (int)StatusCodes.GeneralError });
+            }
+        }
+
+        [Route("ChangeWin")]
+        [HttpPost]
+        public IActionResult ChangeWin(string token, decimal amount, decimal previousAmount, string transactionId, string previousTransactionId, WinType changeWinType, int gameId, int productId, Int64 roundId, string hash, string currency)
+        {
+            var rawHash = $"{token}|{amount}|{previousAmount}|{transactionId}|{previousTransactionId}|{changeWinType}|{gameId}|{productId}|{roundId}|{currency}";
+            var hash1 = GetSha256(rawHash);
+            var userId = _casinoRepository.GetUserIdWithToken(token).Result;
+
+            if (userId == null)
+            {
+                return StatusCode((int)StatusCodes.UserNotFound);
+            }
+
+            if (amount <= 0 || previousAmount <= 0)
+            {
+                return StatusCode((int)StatusCodes.InvalidAmount);
+            }
+
+            //if (hash != hash1)
+            //{
+            //    return Ok(new { StatusCode = (int)StatusCodes.GeneralError });
+            //}
+
+            var statusCode = _casinoRepository.ChangeWin(amount, previousAmount, transactionId, previousTransactionId, userId, currency, out var currentBalance, out var internalTransactionId);
+
+            if (statusCode == 0)
+            {
+                var changeWinInfo = new ChangeWinInfo { TransactionId = internalTransactionId, CurrentBalance = currentBalance };
+                var response = new SuccesfulChangeWinResponse { StatusCode = (int)StatusCodes.Success, Data = changeWinInfo };
+                return Ok(response);
+            }
+            else if (statusCode == -1)
+            {
+                var changeWinInfo = new ChangeWinInfo { TransactionId = internalTransactionId, CurrentBalance = currentBalance };
+                var response = new SuccesfulChangeWinResponse { StatusCode = (int)StatusCodes.AlreadyProcessedTransaction, Data = changeWinInfo };
                 return Ok(response);
             }
             else if (statusCode == -2)

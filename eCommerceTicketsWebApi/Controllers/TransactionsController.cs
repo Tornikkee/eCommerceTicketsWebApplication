@@ -1,21 +1,14 @@
 ﻿using eCommerceTicketsWebApplication.Data.Cart;
-using eCommerceTicketsWebApplication.Data.DTOS;
 using eCommerceTicketsWebApplication.Data.Enums;
 using eCommerceTicketsWebApplication.Data.Repositories;
 using eCommerceTicketsWebApplication.DTOS;
 using eCommerceTicketsWebApplication.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using RestSharp;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Security.Claims;
-using System.Security.Policy;
-using System.Text;
-using System.Text.Unicode;
+using XAct;
+using DataTables;
+using Newtonsoft.Json;
 
 namespace eCommerceTicketsWebApplication.Controllers
 {

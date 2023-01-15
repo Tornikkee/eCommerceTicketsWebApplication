@@ -5,6 +5,7 @@
         Deposit = 1,
         Withdrawal,
         Payment,
-        CancelBet
+        CancelBet,
+        ChangeWin
     }
 }
