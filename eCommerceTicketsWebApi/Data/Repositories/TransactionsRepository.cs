@@ -71,7 +71,7 @@ namespace eCommerceTicketsWebApplication.Data.Repositories
                 dp.Add("@UserId", userId);
                 dp.Add("@Balance", wallet.Balance - amount);
 
-                if (wallet.Balance > amount)
+                if (wallet.Balance >= amount)
                 {
                     await db.ExecuteAsync("UpdateBalanceById", dp, commandType: CommandType.StoredProcedure);
                 }
